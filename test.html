@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>チェーンソー以外の振動工具　振動ばく露時間計算機</title>
+
+<style>
+body{
+  font-family:Arial,"Yu Gothic",sans-serif;
+  max-width:760px;
+  margin:25px auto;
+  padding:20px;
+  line-height:1.65
+}
+
+h1{
+  font-size:22px
+}
+
+.box{
+  padding:16px;
+  border:1px solid #aaa;
+  border-radius:8px;
+  margin:15px 0
+}
+
+label{
+  display:block;
+  margin:12px 0 4px;
+  font-weight:bold
+}
+
+input{
+  width:100%;
+  box-sizing:border-box;
+  padding:10px;
+  font-size:16px
+}
+
+button{
+  margin-top:15px;
+  padding:11px 25px;
+  font-size:16px;
+  cursor:pointer
+}
+
+.result{
+  margin-top:18px;
+  padding:15px;
+  border:1px solid #888;
+  border-radius:8px
+}
+
+.big{
+  font-size:20px;
+  font-weight:bold
+}
+
+.note{
+  font-size:13px
+}
+
+hr{
+  border:0;
+  border-top:1px solid #ddd;
+  margin:18px 0
+}
+
+/* 優先項目の赤丸 */
+.priority{
+  color:red;
+  font-weight:bold;
+  font-size:18px;
+  margin-right:4px;
+}
+
+/* 実際に使える時間を強調 */
+.final-time{
+  font-size:20px;
+  font-weight:bold;
+}
+</style>
+</head>
+
+<body>
+
+<h1>
+チェーンソー以外の振動工具<br>
+振動ばく露時間・簡易計算機
+</h1>
+
+<div class="box">
+
+<label for="a">振動値 a（m/s²）</label>
+
+<input
+  id="a"
+  type="number"
+  step="0.01"
+  min="0.01"
+  value="4.0"
+>
+
+<button onclick="calc()">計算</button>
+
+</div>
+
+
+<div class="result">
+
+<div class="big" id="measure">―</div>
+
+<hr>
+
+<p>
+① A(8)=2.5 m/s²（対策値）に相当する時間：
+<strong id="t25">―</strong>
+</p>
+
+<p>
+② A(8)=5.0 m/s²（限界値）に相当する時間：
+<strong id="t50">―</strong>
+</p>
+
+<p>
+③ 振動ばく露限界時間 T<sub>L</sub>：
+<strong id="tl">―</strong>
+</p>
+
+<p>
+④ 厚労省指針上の「当面の1日上限」：
+<strong id="daily">―</strong>
+</p>
+
+<p>
+<span id="priority5"></span>
+⑤ 1日に使える振動ばく露時間：
+<strong id="daily2" class="final-time">―</strong>
+</p>
+
+<hr>
+
+<p>
+⑥ 連続使用時間（はつり・かしめ・切断・鋲打・削孔）：
+<strong>おおむね10分以内</strong>
+</p>
+
+<p>
+⑦ 連続使用後の休憩時間：
+<strong>5分以上</strong>
+</p>
+
+<p>
+⑧ その他の対象業務の連続使用時間：
+<strong>おおむね30分以内</strong>
+</p>
+
+<p>
+⑨ その他の対象業務の連続使用後の休憩時間：
+<strong>5分以上</strong>
+</p>
+
+</div>
+
+
+<div class="box">
+
+<strong>使い方の目安</strong>
+
+<p>
+上の計算結果の「⑤ 1日に使える振動ばく露時間」が、
+振動工具を実際に使用する際の1日の振動ばく露時間の目安です。
+</p>
+
+<p>
+<strong>
+🔴が付いている項目が、計算結果から最終的に採用される時間です。
+</strong>
+</p>
+
+<p>
+連続使用時間と休憩時間は、作業区分に応じて⑥～⑨の数値を使います。
+</p>
+
+<p class="note">
+※「1日の振動ばく露時間」は工具が実際に振動している時間です。
+休止時間は含みません。
+</p>
+
+</div>
+
+
+<div class="box">
+
+<strong>一連続の振動ばく露時間</strong>
+
+<p>
+<strong>
+金属又は岩石のはつり、かしめ、切断、鋲打及び削孔：
+</strong>
+おおむね10分以内。
+一連続作業の後、5分以上の休止時間。
+</p>
+
+<p>
+<strong>
+上記以外の対象業務：
+</strong>
+おおむね30分以内。
+一連続作業の後、5分以上の休止時間。
+</p>
+
+<p class="note">
+※工具の種類を選ぶ必要はありません。
+厚生労働省の指針で区分が決まっているため、
+ここに両方を常時表示しています。
+</p>
+
+</div>
+
+
+<div class="box note">
+
+<strong>計算について</strong>
+<br><br>
+
+日振動ばく露量：
+A(8) = a × √(T / 8)
+
+<br><br>
+
+A(8)=2.5 m/s²：
+T = 50 / a²
+
+<br>
+
+A(8)=5.0 m/s²：
+T<sub>L</sub> = 200 / a²
+
+<br><br>
+
+<strong>重要：</strong>
+
+③はA(8)=5.0 m/s²になる計算上の時間です。
+
+この時間（T<sub>L</sub>）が2時間を超える場合、
+厚生労働省指針では当面、
+1日の振動ばく露時間を2時間以下とします。
+
+<br><br>
+
+<strong>
+したがって⑤は、原則として
+「T<sub>L</sub>」と「2時間以下（当面）」を考慮して
+実際に使用する1日の振動ばく露時間を表示します。
+</strong>
+
+</div>
+
+
+<div class="box note">
+
+<strong>対象業務</strong>
+<br><br>
+
+ピストンによる打撃機構を有する工具、
+可搬式エンジンカッター等（チェーンソーを除く）、
+携帯用皮はぎ機等の回転工具、
+携帯用タイタンパー等、
+一定の研削盤、
+締付工具、
+往復動工具などが対象です。
+
+</div>
+
+
+<div class="box note">
+
+<strong>【対策値と限界値とは？】</strong>
+
+<br><br>
+
+<strong>
+■ 日振動ばく露対策値：A(8)＝2.5 m/s²
+</strong>
+
+<br>
+
+振動ばく露をできるだけ減らすための目安です。
+
+A(8)が2.5 m/s²を超える場合は、
+振動ばく露時間を短くする、
+低振動の工具を選ぶなど、
+振動を減らすための対策を検討します。
+
+<br><br>
+
+<strong>
+■ 日振動ばく露限界値：A(8)＝5.0 m/s²
+</strong>
+
+<br>
+
+これを超えないように振動ばく露時間を抑制し、
+低振動の工具を選ぶなどの措置を講じる必要があります。
+
+<br>
+
+つまり、
+<strong>
+5.0 m/s²は「超えないように管理する上限」
+</strong>、
+2.5 m/s²は
+<strong>
+「低減対策を進めるための目安」
+</strong>
+です。
+
+<br><br>
+
+<strong>■ A(8)とは？</strong>
+
+<br>
+
+実際の振動の強さと振動にさらされた時間を、
+8時間を基準として評価した値です。
+
+この計算機では、
+
+A(8)＝a × √(T／8)
+
+で計算しています。
+
+</div>
+
+
+<div class="box note">
+
+<strong>【参考】チェーンソーの場合</strong>
+
+<br><br>
+
+チェーンソーには、
+上記の「チェーンソー以外の振動工具」とは別の
+「チェーンソー取扱い作業指針」があります。
+
+<br><br>
+
+・日振動ばく露限界値：
+<strong>5.0 m/s²</strong>
+
+<br>
+
+・日振動ばく露対策値：
+<strong>2.5 m/s²</strong>
+
+<br>
+
+・振動ばく露限界時間：
+<strong>T<sub>L</sub>＝200 / a²（時間）</strong>
+
+<br>
+
+・T<sub>L</sub>が2時間を超える場合：
+<strong>当面、1日の振動ばく露時間を2時間以下</strong>
+
+<br>
+
+・ただし、チェーンソーの点検・整備を適切に行い、
+個々のチェーンソーの振動値を測定・算出している場合は例外があり、
+その場合でも
+<strong>
+1日のばく露時間は4時間以下とすることが望ましい
+</strong>
+とされています。
+
+<br>
+
+・一連続の振動ばく露時間：
+<strong>10分以内</strong>
+
+<br>
+
+・大型で重いチェーンソーを使用する場合：
+<strong>
+1日の振動ばく露時間および一連続の振動ばく露時間をさらに短縮
+</strong>
+
+<br><br>
+
+<a
+href="https://www.mhlw.go.jp/web/t_doc?dataId=00tb5543&dataType=1&pageNo=1"
+target="_blank"
+rel="noopener noreferrer"
+>
+厚生労働省「チェーンソー取扱い作業指針」
+</a>
+
+</div>
+
+
+<p class="note">
+
+<strong>厚生労働省 公式資料：</strong>
+<br>
+
+<a
+href="https://www.mhlw.go.jp/web/t_doc?dataId=00tb5544&dataType=1&pageNo=1"
+target="_blank"
+rel="noopener noreferrer"
+>
+「チェーンソー以外の振動工具の取扱い業務に係る振動障害予防対策指針」
+</a>
+
+</p>
+
+
+<script>
+
+function fmt(hours){
+
+  if(!Number.isFinite(hours)){
+    return "―";
+  }
+
+  const total=Math.round(hours*60);
+
+  const h=Math.floor(total/60);
+
+  const m=total%60;
+
+  if(h===0){
+    return m+"分";
+  }
+
+  return h+"時間"+(m ? m+"分" : "");
+
+}
+
+
+function calc(){
+
+  const a=Number(
+    document.getElementById("a").value
+  );
+
+  if(!Number.isFinite(a)||a<=0){
+
+    document.getElementById("measure").textContent=
+      "正しい振動値を入力してください";
+
+    document.getElementById("t25").textContent="―";
+    document.getElementById("t50").textContent="―";
+    document.getElementById("tl").textContent="―";
+    document.getElementById("daily").textContent="―";
+    document.getElementById("daily2").textContent="―";
+    document.getElementById("priority5").textContent="";
+
+    return;
+  }
+
+
+  /*
+   * A(8)=2.5 m/s² に相当する時間
+   */
+  const t25=50/(a*a);
+
+
+  /*
+   * A(8)=5.0 m/s² に相当する時間
+   */
+  const t50=200/(a*a);
+
+
+  /*
+   * 振動ばく露限界時間 TL
+   */
+  const tl=t50;
+
+
+  /*
+   * TLが2時間を超える場合
+   * 厚労省指針上、当面1日2時間以下
+   *
+   * TLが2時間以下ならTLを採用
+   */
+  const dailyHours=
+    tl>2
+      ? 2
+      : tl;
+
+
+  /*
+   * 表示
+   */
+  document.getElementById("measure").textContent=
+    "振動値 "+a.toFixed(2)+" m/s²";
+
+
+  document.getElementById("t25").textContent=
+    fmt(t25);
+
+
+  document.getElementById("t50").textContent=
+    fmt(t50);
+
+
+  document.getElementById("tl").textContent=
+    fmt(tl);
+
+
+  /*
+   * ④
+   */
+  if(tl>2){
+
+    document.getElementById("daily").textContent=
+      "2時間以下（当面）";
+
+  }else{
+
+    document.getElementById("daily").textContent=
+      "―（TLが2時間以下のため当面の2時間制限は適用されない）";
+
+  }
+
+
+  /*
+   * ⑤ 最終採用値
+   */
+  document.getElementById("daily2").textContent=
+    fmt(dailyHours);
+
+
+  /*
+   * ⑤を最終的な採用項目として赤丸表示
+   */
+  document.getElementById("priority5").textContent=
+    "🔴 ";
+
+
+}
+
+
+/*
+ * ページ読み込み時に計算
+ */
+calc();
+
+</script>
+
+</body>
+</html>
